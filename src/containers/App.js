@@ -1,17 +1,29 @@
 import React from 'react';
+import { connect } from 'react-redux'
 import CardList from '../components/CardList';
 import SearchBox from '../components/SearchBox';
 import Scroll from '../components/Scroll';
 import ErrorBoundary from '../components/ErrorBoundary';
+import { setSearchField } from '../actions';
 import './App.css';
 
+const mapStateToProps = state => {
+   return {
+      searchField: state.searchField
+   }
+}
+
+const mapDispatchToProps = dispatch => {
+   return {
+      onSearchChange: (event) => dispatch(setSearchField(event.target.value))
+   }
+}
 
 class App extends React.Component {
    constructor() {
       super();
       this.state = {
          robots: [],
-         searchField: ''
       };
    }
 
@@ -26,12 +38,9 @@ class App extends React.Component {
       be called inside searchBox, which will change 'this' to refer to object 
       inside searchBox. */
 
-   onSearchChange = (event) => {
-      this.setState({searchField: event.target.value});
-   }
-
    render(){
-      const { robots, searchField } = this.state;
+      const { robots } = this.state;
+      const {searchField, onSearchChange} = this.props;
       const filteredRobots = robots.filter(robot => {
          return robot.name.toLowerCase().includes(searchField.toLowerCase());
       });
@@ -40,7 +49,7 @@ class App extends React.Component {
          (<h1 className='tc'>LOADING...</h1>) :
          (<div className = 'tc'>
             <h1 className = 'f1'>Robo Friends</h1>
-            <SearchBox searchChange = {this.onSearchChange}/>
+            <SearchBox searchChange = {onSearchChange}/>
             <Scroll>
                <ErrorBoundary>
                   <CardList robots = {filteredRobots}/>
@@ -51,4 +60,4 @@ class App extends React.Component {
       }
 }
 
-export default App;
+export default connect(mapStateToProps, mapDispatchToProps)(App);
